@@ -9,6 +9,7 @@ Generated files:
 - `particle-life-intro-deck.pdf`
 - `emergence-visual-story.pdf`
 - `cuda-simulation-story.pdf`
+- `particle-lenia-advancement.pdf`
 
 Regenerate them with:
 
@@ -17,4 +18,3 @@ python3 tools/make_pdfs.py
 ```
 
 The PDF generator is dependency-free and draws the decks as vector PDF pages.
-

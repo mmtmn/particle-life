@@ -29,12 +29,19 @@ struct KernelConfig {
   int particleCount = 0;
   int speciesCount = 0;
   int threeD = 0;
+  int mode = 0;
   float worldSize = 1.0f;
   float interactionRadius = 1.0f;
   float repulsionRadius = 0.1f;
   float forceScale = 1.0f;
   float friction = 0.9f;
   float timeStep = 0.016f;
+  float leniaKernelMu = 4.0f;
+  float leniaKernelSigma = 1.0f;
+  float leniaKernelWeight = 0.022f;
+  float leniaGrowthMu = 0.60f;
+  float leniaGrowthSigma = 0.15f;
+  float leniaRepulsion = 1.0f;
 };
 
 __device__ float wrapDelta(float delta, float halfExtent) {
@@ -57,6 +64,11 @@ __device__ float wrapPosition(float value, float halfExtent) {
   return value;
 }
 
+__device__ float gaussianPeak(float value, float mu, float sigma) {
+  const float normalized = (value - mu) / fmaxf(sigma, 0.0001f);
+  return expf(-(normalized * normalized));
+}
+
 __global__ void stepKernel(const float4* inPositions, const float4* inVelocities,
                            const int* species, const float* forceMatrix,
                            float4* outPositions, float4* outVelocities,
@@ -73,6 +85,101 @@ __global__ void stepKernel(const float4* inPositions, const float4* inVelocities
   float ay = 0.0f;
   float az = 0.0f;
   const float radius2 = config.interactionRadius * config.interactionRadius;
+
+  if (config.mode == static_cast<int>(SimulationMode::ParticleLenia)) {
+    // Particle Lenia: move down the local energy gradient E = R - G(U).
+    const float sigmaK = fmaxf(config.leniaKernelSigma, 0.0001f);
+    const float sigmaK2 = sigmaK * sigmaK;
+    const float sigmaG = fmaxf(config.leniaGrowthSigma, 0.0001f);
+    const float sigmaG2 = sigmaG * sigmaG;
+    const float repelRadius = fmaxf(config.repulsionRadius, 0.001f);
+
+    float fieldU = config.leniaKernelWeight *
+                   gaussianPeak(0.0f, config.leniaKernelMu, sigmaK);
+    float gradUx = 0.0f;
+    float gradUy = 0.0f;
+    float gradUz = 0.0f;
+    float gradRx = 0.0f;
+    float gradRy = 0.0f;
+    float gradRz = 0.0f;
+
+    for (int j = 0; j < config.particleCount; ++j) {
+      if (i == j) {
+        continue;
+      }
+
+      const float4 other = inPositions[j];
+      const float dx = wrapDelta(other.x - self.x, config.worldSize);
+      const float dy = wrapDelta(other.y - self.y, config.worldSize);
+      const float dz = config.threeD ? wrapDelta(other.z - self.z,
+                                                 config.worldSize)
+                                     : 0.0f;
+      const float dist2 = dx * dx + dy * dy + dz * dz;
+      if (dist2 <= 1.0e-7f || dist2 > radius2) {
+        continue;
+      }
+
+      const float dist = sqrtf(dist2);
+      const float invDist = 1.0f / dist;
+      const float kernel = config.leniaKernelWeight *
+                           gaussianPeak(dist, config.leniaKernelMu, sigmaK);
+      fieldU += kernel;
+
+      const float dKernelDr =
+          kernel * (-2.0f * (dist - config.leniaKernelMu) / sigmaK2);
+      const float xMinusOtherScale = -dKernelDr * invDist;
+      gradUx += dx * xMinusOtherScale;
+      gradUy += dy * xMinusOtherScale;
+      gradUz += dz * xMinusOtherScale;
+
+      if (dist < repelRadius) {
+        const float compression = 1.0f - dist / repelRadius;
+        const float gradScale =
+            config.leniaRepulsion * compression / (repelRadius * dist);
+        gradRx += dx * gradScale;
+        gradRy += dy * gradScale;
+        gradRz += dz * gradScale;
+      }
+    }
+
+    const float growth =
+        gaussianPeak(fieldU, config.leniaGrowthMu, sigmaG);
+    const float growthSlope =
+        growth * (-2.0f * (fieldU - config.leniaGrowthMu) / sigmaG2);
+
+    float4 velocity;
+    velocity.x = (growthSlope * gradUx - gradRx) * config.forceScale;
+    velocity.y = (growthSlope * gradUy - gradRy) * config.forceScale;
+    velocity.z = config.threeD
+                     ? (growthSlope * gradUz - gradRz) * config.forceScale
+                     : 0.0f;
+    velocity.w = fieldU;
+
+    const float maxStepSpeed = fmaxf(config.worldSize * 1.5f, 1.0f);
+    const float speed2 = velocity.x * velocity.x + velocity.y * velocity.y +
+                         velocity.z * velocity.z;
+    if (speed2 > maxStepSpeed * maxStepSpeed) {
+      const float scale = maxStepSpeed * rsqrtf(speed2);
+      velocity.x *= scale;
+      velocity.y *= scale;
+      velocity.z *= scale;
+    }
+
+    float4 next = self;
+    next.x = wrapPosition(next.x + velocity.x * config.timeStep,
+                          config.worldSize);
+    next.y = wrapPosition(next.y + velocity.y * config.timeStep,
+                          config.worldSize);
+    next.z = config.threeD ? wrapPosition(next.z + velocity.z * config.timeStep,
+                                          config.worldSize)
+                           : 0.0f;
+    next.w = growth;
+
+    outPositions[i] = next;
+    outVelocities[i] = velocity;
+    return;
+  }
+
   const float repelRadius = fmaxf(config.repulsionRadius, 0.001f);
   const float attractionSpan =
       fmaxf(config.interactionRadius - repelRadius, 0.001f);
@@ -177,6 +284,15 @@ struct CudaSimulation::Impl {
     config.forceScale = clampValue(config.forceScale, 0.1f, 80.0f);
     config.friction = clampValue(config.friction, 0.1f, 0.999f);
     config.timeStep = clampValue(config.timeStep, 0.001f, 0.05f);
+    config.leniaKernelMu = clampValue(config.leniaKernelMu, 0.05f, 80.0f);
+    config.leniaKernelSigma =
+        clampValue(config.leniaKernelSigma, 0.01f, 40.0f);
+    config.leniaKernelWeight =
+        clampValue(config.leniaKernelWeight, 0.00001f, 5.0f);
+    config.leniaGrowthMu = clampValue(config.leniaGrowthMu, 0.001f, 20.0f);
+    config.leniaGrowthSigma =
+        clampValue(config.leniaGrowthSigma, 0.001f, 20.0f);
+    config.leniaRepulsion = clampValue(config.leniaRepulsion, 0.0f, 20.0f);
 
     hostForces.assign(kMaxSpecies * kMaxSpecies, 0.0f);
 
@@ -212,6 +328,7 @@ struct CudaSimulation::Impl {
 };
 
 CudaSimulation::CudaSimulation(SimConfig config) : impl_(new Impl(config)) {
+  setSimulationMode(impl_->config.mode);
   randomizeForces(impl_->config.seed + 17);
   randomizeParticles(impl_->config.seed);
 }
@@ -223,12 +340,19 @@ void CudaSimulation::step() {
   kernelConfig.particleCount = impl_->config.particleCount;
   kernelConfig.speciesCount = impl_->config.speciesCount;
   kernelConfig.threeD = impl_->config.threeD ? 1 : 0;
+  kernelConfig.mode = static_cast<int>(impl_->config.mode);
   kernelConfig.worldSize = impl_->config.worldSize;
   kernelConfig.interactionRadius = impl_->config.interactionRadius;
   kernelConfig.repulsionRadius = impl_->config.repulsionRadius;
   kernelConfig.forceScale = impl_->config.forceScale;
   kernelConfig.friction = impl_->config.friction;
   kernelConfig.timeStep = impl_->config.timeStep;
+  kernelConfig.leniaKernelMu = impl_->config.leniaKernelMu;
+  kernelConfig.leniaKernelSigma = impl_->config.leniaKernelSigma;
+  kernelConfig.leniaKernelWeight = impl_->config.leniaKernelWeight;
+  kernelConfig.leniaGrowthMu = impl_->config.leniaGrowthMu;
+  kernelConfig.leniaGrowthSigma = impl_->config.leniaGrowthSigma;
+  kernelConfig.leniaRepulsion = impl_->config.leniaRepulsion;
 
   const int threads = 128;
   const int blocks = (impl_->config.particleCount + threads - 1) / threads;
@@ -272,6 +396,38 @@ void CudaSimulation::setWorldSize(float size) {
 
 void CudaSimulation::setThreeD(bool enabled) { impl_->config.threeD = enabled; }
 
+void CudaSimulation::setSimulationMode(SimulationMode mode) {
+  impl_->config.mode = mode;
+  if (mode == SimulationMode::ParticleLenia) {
+    if (impl_->config.repulsionRadius < 0.5f) {
+      impl_->config.repulsionRadius = 1.0f;
+    }
+    impl_->config.repulsionRadius = clampValue(impl_->config.repulsionRadius,
+                                               0.25f,
+                                               impl_->config.interactionRadius);
+    const float leniaRadius =
+        impl_->config.leniaKernelMu + 4.0f * impl_->config.leniaKernelSigma;
+    impl_->config.interactionRadius =
+        clampValue(std::max(impl_->config.interactionRadius, leniaRadius),
+                   0.05f, impl_->config.worldSize);
+    if (impl_->config.forceScale > 10.0f) {
+      impl_->config.forceScale = 8.0f;
+    }
+  } else {
+    if (impl_->config.repulsionRadius >= 0.5f) {
+      impl_->config.repulsionRadius = 0.18f;
+    }
+    if (impl_->config.interactionRadius >
+        impl_->config.leniaKernelMu + impl_->config.leniaKernelSigma) {
+      impl_->config.interactionRadius =
+          clampValue(2.6f, 0.05f, impl_->config.worldSize);
+    }
+    if (impl_->config.forceScale <= 10.0f) {
+      impl_->config.forceScale = 18.0f;
+    }
+  }
+}
+
 void CudaSimulation::setInteractionRadius(float radius) {
   impl_->config.interactionRadius =
       clampValue(radius, 0.05f, impl_->config.worldSize);
@@ -282,6 +438,14 @@ void CudaSimulation::setInteractionRadius(float radius) {
 
 void CudaSimulation::setForceScale(float scale) {
   impl_->config.forceScale = clampValue(scale, 0.1f, 80.0f);
+}
+
+void CudaSimulation::setLeniaGrowthMu(float value) {
+  impl_->config.leniaGrowthMu = clampValue(value, 0.001f, 20.0f);
+}
+
+void CudaSimulation::setLeniaGrowthSigma(float value) {
+  impl_->config.leniaGrowthSigma = clampValue(value, 0.001f, 20.0f);
 }
 
 void CudaSimulation::setForce(int targetSpecies, int sourceSpecies,
@@ -356,6 +520,28 @@ void CudaSimulation::randomizeForces(std::uint32_t seed) {
   }
 
   impl_->uploadForces();
+}
+
+void CudaSimulation::randomizeLeniaParams(std::uint32_t seed) {
+  std::mt19937 rng(seed);
+  std::uniform_real_distribution<float> kernelMu(2.6f, 6.2f);
+  std::uniform_real_distribution<float> kernelSigma(0.55f, 1.65f);
+  std::uniform_real_distribution<float> growthMu(0.25f, 1.10f);
+  std::uniform_real_distribution<float> growthSigma(0.06f, 0.24f);
+  std::uniform_real_distribution<float> repulsion(0.65f, 1.80f);
+
+  impl_->config.leniaKernelMu = kernelMu(rng);
+  impl_->config.leniaKernelSigma = kernelSigma(rng);
+  impl_->config.leniaKernelWeight =
+      0.022f * (4.0f / impl_->config.leniaKernelMu);
+  impl_->config.leniaGrowthMu = growthMu(rng);
+  impl_->config.leniaGrowthSigma = growthSigma(rng);
+  impl_->config.leniaRepulsion = repulsion(rng);
+  impl_->config.repulsionRadius = 1.0f;
+  impl_->config.interactionRadius =
+      clampValue(impl_->config.leniaKernelMu +
+                     4.0f * impl_->config.leniaKernelSigma,
+                 0.05f, impl_->config.worldSize);
 }
 
 const SimConfig& CudaSimulation::config() const { return impl_->config; }

@@ -20,6 +20,7 @@ namespace {
 using particle_life::CudaSimulation;
 using particle_life::ParticleSnapshot;
 using particle_life::SimConfig;
+using particle_life::SimulationMode;
 using particle_life::kMaxSpecies;
 
 constexpr double kPi = 3.14159265358979323846;
@@ -29,6 +30,11 @@ struct Options {
   int headlessSteps = -1;
   int width = 1280;
   int height = 800;
+  bool particlesSet = false;
+  bool speciesSet = false;
+  bool radiusSet = false;
+  bool forceScaleSet = false;
+  bool dtSet = false;
 };
 
 struct Color {
@@ -113,18 +119,36 @@ std::uint32_t parseSeed(const std::string& text) {
   return static_cast<std::uint32_t>(value);
 }
 
+SimulationMode parseMode(const std::string& text) {
+  if (text == "life" || text == "particle-life") {
+    return SimulationMode::ParticleLife;
+  }
+  if (text == "lenia" || text == "particle-lenia") {
+    return SimulationMode::ParticleLenia;
+  }
+  failUsage("Invalid mode: " + text + " (expected life or lenia)");
+}
+
+const char* modeName(SimulationMode mode) {
+  return mode == SimulationMode::ParticleLenia ? "Particle Lenia"
+                                               : "Particle Life";
+}
+
 void printControls() {
   std::cout
       << "\nParticle Life CUDA controls\n"
       << "  Space       pause/resume\n"
+      << "  L           toggle Particle Life / Particle Lenia mode\n"
       << "  V           toggle 2D/3D (3D reseeds particle depth)\n"
-      << "  R           randomize particles and force matrix\n"
+      << "  R           randomize particles and current mode parameters\n"
       << "  P           randomize particles only\n"
-      << "  F           randomize force matrix only\n"
+      << "  F           randomize force matrix or Particle Lenia parameters\n"
       << "  Up/Down     increase/decrease particle count (Shift = larger step)\n"
       << "  Left/Right  shrink/grow world size\n"
       << "  I/O         shrink/grow interaction radius\n"
       << "  Q/E         decrease/increase global force scale\n"
+      << "  Z/X         lower/raise Particle Lenia target field density\n"
+      << "  C/B         narrow/widen Particle Lenia growth band\n"
       << "  W/S         select affected particle species row\n"
       << "  A/D         select source particle species column\n"
       << "  -/=         repel/attract selected species pair\n"
@@ -143,9 +167,17 @@ void printUsage() {
       << "  --particles N       starting particle count (default 8192)\n"
       << "  --max-particles N   maximum particles available at runtime (default 65536)\n"
       << "  --species N         particle species, 1-8 (default 6)\n"
+      << "  --mode NAME         life or lenia (default life)\n"
+      << "  --particle-lenia    shortcut for --mode lenia\n"
       << "  --size N            half-width of the wrapped world (default 22)\n"
       << "  --radius N          interaction radius (default 2.6)\n"
       << "  --force-scale N     global force multiplier (default 18)\n"
+      << "  --lenia-mu-k N      Particle Lenia kernel ring radius (default 4)\n"
+      << "  --lenia-sigma-k N   Particle Lenia kernel ring width (default 1)\n"
+      << "  --lenia-w-k N       Particle Lenia kernel weight (default 0.022)\n"
+      << "  --lenia-mu-g N      Particle Lenia target field density (default 0.60)\n"
+      << "  --lenia-sigma-g N   Particle Lenia growth band width (default 0.15)\n"
+      << "  --lenia-repulsion N Particle Lenia short-range repulsion (default 1)\n"
       << "  --dt N              simulation timestep seconds (default 0.016)\n"
       << "  --seed N            deterministic random seed (default 1337)\n"
       << "  --3d                start in 3D mode\n"
@@ -173,18 +205,39 @@ Options parseOptions(int argc, char** argv) {
       std::exit(0);
     } else if (arg == "--particles") {
       options.config.particleCount = parseInt(requireValue(arg), arg);
+      options.particlesSet = true;
     } else if (arg == "--max-particles") {
       options.config.maxParticles = parseInt(requireValue(arg), arg);
     } else if (arg == "--species") {
       options.config.speciesCount = parseInt(requireValue(arg), arg);
+      options.speciesSet = true;
+    } else if (arg == "--mode") {
+      options.config.mode = parseMode(requireValue(arg));
+    } else if (arg == "--particle-lenia") {
+      options.config.mode = SimulationMode::ParticleLenia;
     } else if (arg == "--size") {
       options.config.worldSize = parseFloat(requireValue(arg), arg);
     } else if (arg == "--radius") {
       options.config.interactionRadius = parseFloat(requireValue(arg), arg);
+      options.radiusSet = true;
     } else if (arg == "--force-scale") {
       options.config.forceScale = parseFloat(requireValue(arg), arg);
+      options.forceScaleSet = true;
+    } else if (arg == "--lenia-mu-k") {
+      options.config.leniaKernelMu = parseFloat(requireValue(arg), arg);
+    } else if (arg == "--lenia-sigma-k") {
+      options.config.leniaKernelSigma = parseFloat(requireValue(arg), arg);
+    } else if (arg == "--lenia-w-k") {
+      options.config.leniaKernelWeight = parseFloat(requireValue(arg), arg);
+    } else if (arg == "--lenia-mu-g") {
+      options.config.leniaGrowthMu = parseFloat(requireValue(arg), arg);
+    } else if (arg == "--lenia-sigma-g") {
+      options.config.leniaGrowthSigma = parseFloat(requireValue(arg), arg);
+    } else if (arg == "--lenia-repulsion") {
+      options.config.leniaRepulsion = parseFloat(requireValue(arg), arg);
     } else if (arg == "--dt") {
       options.config.timeStep = parseFloat(requireValue(arg), arg);
+      options.dtSet = true;
     } else if (arg == "--seed") {
       options.config.seed = parseSeed(requireValue(arg));
     } else if (arg == "--3d") {
@@ -198,6 +251,26 @@ Options parseOptions(int argc, char** argv) {
     } else {
       failUsage("Unknown option: " + arg);
     }
+  }
+
+  if (options.config.mode == SimulationMode::ParticleLenia) {
+    if (!options.particlesSet) {
+      options.config.particleCount = 800;
+    }
+    if (!options.speciesSet) {
+      options.config.speciesCount = 1;
+    }
+    if (!options.radiusSet) {
+      options.config.interactionRadius =
+          options.config.leniaKernelMu + 4.0f * options.config.leniaKernelSigma;
+    }
+    if (!options.forceScaleSet) {
+      options.config.forceScale = 8.0f;
+    }
+    if (!options.dtSet) {
+      options.config.timeStep = 0.04f;
+    }
+    options.config.repulsionRadius = 1.0f;
   }
 
   if (options.config.particleCount < 1) {
@@ -229,15 +302,21 @@ std::string formatFloat(float value, int precision = 2) {
 std::string buildTitle(const AppState& app) {
   const auto& config = app.simulation.config();
   std::ostringstream title;
-  title << "Particle Life CUDA | " << (config.threeD ? "3D" : "2D")
+  title << modeName(config.mode) << " CUDA | " << (config.threeD ? "3D" : "2D")
         << " | " << config.particleCount << "/" << config.maxParticles
         << " particles | size " << formatFloat(config.worldSize, 1)
-        << " | radius " << formatFloat(config.interactionRadius, 2)
-        << " | pair " << app.selectedTarget << " <- " << app.selectedSource
-        << " " << formatFloat(app.simulation.force(app.selectedTarget,
-                                                    app.selectedSource),
-                               2)
-        << " | scale " << formatFloat(config.forceScale, 1)
+        << " | radius " << formatFloat(config.interactionRadius, 2);
+  if (config.mode == SimulationMode::ParticleLenia) {
+    title << " | muG " << formatFloat(config.leniaGrowthMu, 2)
+          << " | sigmaG " << formatFloat(config.leniaGrowthSigma, 2)
+          << " | kernel " << formatFloat(config.leniaKernelMu, 1);
+  } else {
+    title << " | pair " << app.selectedTarget << " <- " << app.selectedSource
+          << " " << formatFloat(app.simulation.force(app.selectedTarget,
+                                                      app.selectedSource),
+                                 2);
+  }
+  title << " | scale " << formatFloat(config.forceScale, 1)
         << " | " << formatFloat(static_cast<float>(app.fps), 0) << " fps";
   if (app.paused) {
     title << " | paused";
@@ -291,6 +370,17 @@ void changeForceScale(AppState& app, float delta) {
   updateTitle(app, true);
 }
 
+void changeLeniaGrowthMu(AppState& app, float delta) {
+  app.simulation.setLeniaGrowthMu(app.simulation.config().leniaGrowthMu + delta);
+  updateTitle(app, true);
+}
+
+void changeLeniaGrowthSigma(AppState& app, float factor) {
+  app.simulation.setLeniaGrowthSigma(
+      app.simulation.config().leniaGrowthSigma * factor);
+  updateTitle(app, true);
+}
+
 void changeSelectedForce(AppState& app, float delta) {
   const float value =
       app.simulation.force(app.selectedTarget, app.selectedSource) + delta;
@@ -322,6 +412,20 @@ void keyCallback(GLFWwindow* window, int key, int, int action, int mods) {
     case GLFW_KEY_H:
       printControls();
       break;
+    case GLFW_KEY_L: {
+      const SimulationMode nextMode =
+          app->simulation.config().mode == SimulationMode::ParticleLenia
+              ? SimulationMode::ParticleLife
+              : SimulationMode::ParticleLenia;
+      app->simulation.setSimulationMode(nextMode);
+      if (nextMode == SimulationMode::ParticleLenia) {
+        app->simulation.randomizeLeniaParams(app->seedCounter++);
+      }
+      app->simulation.randomizeParticles(app->seedCounter++);
+      resetCamera(*app);
+      updateTitle(*app, true);
+      break;
+    }
     case GLFW_KEY_V: {
       const bool enable3D = !app->simulation.config().threeD;
       app->simulation.setThreeD(enable3D);
@@ -333,7 +437,11 @@ void keyCallback(GLFWwindow* window, int key, int, int action, int mods) {
       break;
     }
     case GLFW_KEY_R:
-      app->simulation.randomizeForces(app->seedCounter++);
+      if (app->simulation.config().mode == SimulationMode::ParticleLenia) {
+        app->simulation.randomizeLeniaParams(app->seedCounter++);
+      } else {
+        app->simulation.randomizeForces(app->seedCounter++);
+      }
       app->simulation.randomizeParticles(app->seedCounter++);
       updateTitle(*app, true);
       break;
@@ -341,7 +449,11 @@ void keyCallback(GLFWwindow* window, int key, int, int action, int mods) {
       app->simulation.randomizeParticles(app->seedCounter++);
       break;
     case GLFW_KEY_F:
-      app->simulation.randomizeForces(app->seedCounter++);
+      if (app->simulation.config().mode == SimulationMode::ParticleLenia) {
+        app->simulation.randomizeLeniaParams(app->seedCounter++);
+      } else {
+        app->simulation.randomizeForces(app->seedCounter++);
+      }
       updateTitle(*app, true);
       break;
     case GLFW_KEY_UP:
@@ -367,6 +479,18 @@ void keyCallback(GLFWwindow* window, int key, int, int action, int mods) {
       break;
     case GLFW_KEY_E:
       changeForceScale(*app, fast ? 5.0f : 1.0f);
+      break;
+    case GLFW_KEY_Z:
+      changeLeniaGrowthMu(*app, fast ? -0.10f : -0.02f);
+      break;
+    case GLFW_KEY_X:
+      changeLeniaGrowthMu(*app, fast ? 0.10f : 0.02f);
+      break;
+    case GLFW_KEY_C:
+      changeLeniaGrowthSigma(*app, fast ? 0.75f : 0.92f);
+      break;
+    case GLFW_KEY_B:
+      changeLeniaGrowthSigma(*app, fast ? 1.25f : 1.08f);
       break;
     case GLFW_KEY_W:
       selectWrapped(app->selectedTarget, -1, speciesCount);
@@ -649,7 +773,9 @@ void render(AppState& app) {
   }
 
   drawParticles(app);
-  drawForceMatrixOverlay(app, width, height);
+  if (config.mode == SimulationMode::ParticleLife) {
+    drawForceMatrixOverlay(app, width, height);
+  }
 }
 
 void runHeadless(CudaSimulation& simulation, int steps) {
@@ -672,7 +798,8 @@ void runHeadless(CudaSimulation& simulation, int steps) {
   }
 
   std::cout << "Headless run complete: " << steps << " CUDA steps, "
-            << particles.size() << " particles, "
+            << modeName(simulation.config().mode) << ", " << particles.size()
+            << " particles, "
             << (simulation.config().threeD ? "3D" : "2D") << ", "
             << formatFloat(static_cast<float>(ms), 2) << " ms wall time\n"
             << "Largest sampled distance from origin: "

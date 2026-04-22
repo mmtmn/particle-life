@@ -556,6 +556,53 @@ DECKS: Sequence[Deck] = [
             },
         ],
     ),
+    (
+        "docs/particle-lenia-advancement.pdf",
+        "Particle Lenia Advancement",
+        [
+            {
+                "visual": "hero_cloud",
+                "kicker": "new direction",
+                "title": "Particle Lenia connects swarms to continuous lifeforms",
+                "subtitle": "It keeps the particle view from Particle Life, but borrows Lenia's smooth fields and growth functions.",
+            },
+            {
+                "visual": "curve",
+                "kicker": "field first",
+                "title": "Particles create a soft Lenia field",
+                "subtitle": "Every particle contributes a radial kernel. Other particles read the combined field where they are standing.",
+                "bullets": [
+                    "The kernel is a ring, not a hard collision rule.",
+                    "The field is continuous, so motion changes smoothly.",
+                    "The same idea works in 2D and 3D.",
+                ],
+            },
+            {
+                "visual": "loop",
+                "kicker": "energy view",
+                "title": "Motion becomes local energy descent",
+                "subtitle": "Particles seek places where the Lenia growth field is high while short-range repulsion prevents collapse.",
+            },
+            {
+                "visual": "thread_particle",
+                "kicker": "multi-agent optimization",
+                "title": "Each particle optimizes its own local objective",
+                "subtitle": "That greedy local rule can escape the static minima that a single global optimizer would prefer.",
+            },
+            {
+                "visual": "2d3d",
+                "kicker": "mass conservation",
+                "title": "Matter moves instead of appearing or vanishing",
+                "subtitle": "The particle count stays fixed. Complex forms emerge from rearrangement, not from creating new mass on a grid.",
+            },
+            {
+                "visual": "patterns",
+                "kicker": "why it matters",
+                "title": "Particle Lenia is a bridge between artificial life and design",
+                "subtitle": "It gives a practical way to search for local rules that produce global self-organization.",
+            },
+        ],
+    ),
 ]
 
 
