@@ -1,0 +1,82 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [7 0 R 9 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+6 0 obj
+<< /Length 2710 >>
+stream
+BT /F2 20.00 Tf 54.00 734.00 Td (CUDA Kernel Guide) Tj ET
+BT /F1 10.50 Tf 54.00 695.00 Td (The simulation step runs in src/sim.cu. One CUDA thread is launched for each) Tj ET
+BT /F1 10.50 Tf 54.00 677.83 Td (particle. That thread reads the previous particle positions, computes one new) Tj ET
+BT /F1 10.50 Tf 54.00 660.65 Td (velocity and position, and writes them to an output buffer.) Tj ET
+BT /F2 14.00 Tf 54.00 629.48 Td (Double Buffering) Tj ET
+BT /F1 10.50 Tf 54.00 602.48 Td (The code keeps two position buffers and two velocity buffers. Each frame reads) Tj ET
+BT /F1 10.50 Tf 54.00 585.30 Td (from the current buffers and writes to the next buffers, then swaps them. This) Tj ET
+BT /F1 10.50 Tf 54.00 568.13 Td (avoids a race where one thread would read a particle that another thread has) Tj ET
+BT /F1 10.50 Tf 54.00 550.95 Td (already updated during the same step.) Tj ET
+BT /F2 14.00 Tf 54.00 519.78 Td (Per-Particle Work) Tj ET
+BT /F1 10.50 Tf 54.00 492.78 Td (For particle i, the kernel loops over all particles j.) Tj ET
+BT /F1 10.50 Tf 54.00 469.60 Td (1. Skip itself.) Tj ET
+BT /F1 10.50 Tf 54.00 452.43 Td (2. Compute the wrapped X/Y/Z delta.) Tj ET
+BT /F1 10.50 Tf 54.00 435.25 Td (3. Ignore particles outside the interaction radius.) Tj ET
+BT /F1 10.50 Tf 54.00 418.08 Td (4. Look up the force value for species[i] <- species[j].) Tj ET
+BT /F1 10.50 Tf 54.00 400.90 Td (5. Apply short-range repulsion if the particles are very close.) Tj ET
+BT /F1 10.50 Tf 54.00 383.73 Td (6. Otherwise apply the force matrix value with a bell-shaped falloff.) Tj ET
+BT /F1 10.50 Tf 54.00 366.55 Td (7. Add the result into acceleration.) Tj ET
+BT /F1 10.50 Tf 54.00 343.38 Td (The implementation is intentionally direct and readable. It is an all-pairs) Tj ET
+BT /F1 10.50 Tf 54.00 326.20 Td (kernel, so the cost grows with N N.) Tj ET
+BT /F2 14.00 Tf 54.00 295.03 Td (Stability Controls) Tj ET
+BT /F1 10.50 Tf 54.00 268.03 Td (The kernel uses three simple stability limits.) Tj ET
+BT /F1 10.50 Tf 62.00 244.85 Td (- A short repulsion radius keeps particles from collapsing into one point.) Tj ET
+BT /F1 10.50 Tf 62.00 228.68 Td (- Friction damps velocity every step.) Tj ET
+BT /F1 10.50 Tf 62.00 212.50 Td (- A maximum speed clamp prevents extreme forces from throwing particles across) Tj ET
+BT /F1 10.50 Tf 54.00 196.33 Td (the whole world in one frame.) Tj ET
+BT /F2 14.00 Tf 54.00 165.15 Td (2D and 3D Branch) Tj ET
+BT /F1 10.50 Tf 54.00 138.15 Td (The same kernel handles 2D and 3D. In 2D mode it sets dz and Z velocity to) Tj ET
+BT /F1 10.50 Tf 54.00 120.98 Td (zero. In 3D mode it includes wrapped Z distance and updates Z position.) Tj ET
+BT /F2 14.00 Tf 54.00 89.80 Td (Rendering Boundary) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 351 >>
+stream
+BT /F1 10.50 Tf 54.00 738.00 Td (The CUDA simulation does not render directly. After each step, the app copies) Tj ET
+BT /F1 10.50 Tf 54.00 720.83 Td (the current particle positions back to the CPU and renders them as OpenGL) Tj ET
+BT /F1 10.50 Tf 54.00 703.65 Td (points. This keeps the code simple and makes the CUDA part easy to understand.) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000197 00000 n 
+0000000272 00000 n 
+0000000340 00000 n 
+0000003101 00000 n 
+0000003247 00000 n 
+0000003648 00000 n 
+trailer << /Size 10 /Root 1 0 R >>
+startxref
+3794
+%%EOF

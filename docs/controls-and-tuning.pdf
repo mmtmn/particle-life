@@ -1,0 +1,88 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [7 0 R 9 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+6 0 obj
+<< /Length 2774 >>
+stream
+BT /F2 20.00 Tf 54.00 734.00 Td (Controls and Tuning) Tj ET
+BT /F1 10.50 Tf 54.00 695.00 Td (Particle life is most useful when tuned interactively. The app exposes the main) Tj ET
+BT /F1 10.50 Tf 54.00 677.83 Td (simulation parameters from the keyboard and shows the force matrix in the) Tj ET
+BT /F1 10.50 Tf 54.00 660.65 Td (top-right corner of the window.) Tj ET
+BT /F2 14.00 Tf 54.00 629.48 Td (Reading the Matrix) Tj ET
+BT /F1 10.50 Tf 54.00 602.48 Td (Rows are affected particles. Columns are source particles. The selected cell is) Tj ET
+BT /F1 10.50 Tf 54.00 585.30 Td (outlined. Green cells attract and red cells repel.) Tj ET
+BT /F1 10.50 Tf 54.00 562.13 Td (For example, pair 2 <- 5 means species 5 is affecting species 2. Increasing) Tj ET
+BT /F1 10.50 Tf 54.00 544.95 Td (that value makes species 2 move toward species 5. Decreasing it makes species 2) Tj ET
+BT /F1 10.50 Tf 54.00 527.78 Td (move away from species 5.) Tj ET
+BT /F2 14.00 Tf 54.00 496.60 Td (Important Controls) Tj ET
+BT /F1 10.50 Tf 62.00 469.60 Td (- W/S selects the affected species row.) Tj ET
+BT /F1 10.50 Tf 62.00 453.43 Td (- A/D selects the source species column.) Tj ET
+BT /F1 10.50 Tf 62.00 437.25 Td (- - makes the selected pair more repulsive.) Tj ET
+BT /F1 10.50 Tf 62.00 421.08 Td (- = makes the selected pair more attractive.) Tj ET
+BT /F1 10.50 Tf 62.00 404.90 Td (- 0 resets the selected pair to neutral.) Tj ET
+BT /F1 10.50 Tf 62.00 388.73 Td (- F randomizes the force matrix.) Tj ET
+BT /F1 10.50 Tf 62.00 372.55 Td (- R randomizes both particles and forces.) Tj ET
+BT /F2 14.00 Tf 54.00 342.38 Td (Particle Count and World Size) Tj ET
+BT /F1 10.50 Tf 54.00 315.38 Td (Use Up/Down to change the particle count. Hold Shift for larger jumps. Use) Tj ET
+BT /F1 10.50 Tf 54.00 298.20 Td (Left/Right to change the wrapped world size.) Tj ET
+BT /F1 10.50 Tf 54.00 275.03 Td (Increasing particle count adds visual richness but costs more GPU work. Reducing) Tj ET
+BT /F1 10.50 Tf 54.00 257.85 Td (world size packs particles tighter, which usually increases interactions and can) Tj ET
+BT /F1 10.50 Tf 54.00 240.68 Td (make patterns more energetic.) Tj ET
+BT /F2 14.00 Tf 54.00 209.50 Td (Radius and Force Scale) Tj ET
+BT /F1 10.50 Tf 54.00 182.50 Td (Use I/O to shrink or grow the interaction radius. A larger radius lets) Tj ET
+BT /F1 10.50 Tf 54.00 165.33 Td (particles affect more neighbors. Use Q/E to change the global force scale.) Tj ET
+BT /F1 10.50 Tf 54.00 148.15 Td (High force scale values can create faster motion but may also make the system) Tj ET
+BT /F1 10.50 Tf 54.00 130.98 Td (noisy.) Tj ET
+BT /F2 14.00 Tf 54.00 99.80 Td (2D and 3D Viewing) Tj ET
+BT /F1 10.50 Tf 54.00 72.80 Td (Press V to switch between 2D and 3D. In 2D, drag to pan and scroll to zoom. In) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 718 >>
+stream
+BT /F1 10.50 Tf 54.00 738.00 Td (3D, drag to orbit and scroll to move the camera closer or farther away.) Tj ET
+BT /F2 14.00 Tf 54.00 706.83 Td (Practical Starting Points) Tj ET
+BT /F1 10.50 Tf 62.00 679.83 Td (- Start with 4,096 to 12,000 particles.) Tj ET
+BT /F1 10.50 Tf 62.00 663.65 Td (- Keep the species count between 4 and 8.) Tj ET
+BT /F1 10.50 Tf 62.00 647.48 Td (- Randomize the force matrix until a few clusters form.) Tj ET
+BT /F1 10.50 Tf 62.00 631.30 Td (- Tune one selected matrix cell at a time so the cause of each change is clear.) Tj ET
+BT /F1 10.50 Tf 62.00 615.13 Td (- If the simulation becomes too chaotic, lower force scale or interaction) Tj ET
+BT /F1 10.50 Tf 54.00 598.95 Td (radius.) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000197 00000 n 
+0000000272 00000 n 
+0000000340 00000 n 
+0000003165 00000 n 
+0000003311 00000 n 
+0000004079 00000 n 
+trailer << /Size 10 /Root 1 0 R >>
+startxref
+4225
+%%EOF

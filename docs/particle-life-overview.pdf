@@ -1,0 +1,83 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [7 0 R 9 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+6 0 obj
+<< /Length 2896 >>
+stream
+BT /F2 20.00 Tf 54.00 734.00 Td (Particle Life Overview) Tj ET
+BT /F1 10.50 Tf 54.00 695.00 Td (Particle life is a simple artificial-life model. The simulation contains many) Tj ET
+BT /F1 10.50 Tf 54.00 677.83 Td (particles, each tagged with a species number. Every species has a configurable) Tj ET
+BT /F1 10.50 Tf 54.00 660.65 Td (relationship with every other species. One species can attract another, repel) Tj ET
+BT /F1 10.50 Tf 54.00 643.48 Td (another, ignore another, or do any mixture in between.) Tj ET
+BT /F2 14.00 Tf 54.00 612.30 Td (Core Idea) Tj ET
+BT /F1 10.50 Tf 54.00 585.30 Td (For every particle, the CUDA kernel checks nearby particles. It computes a) Tj ET
+BT /F1 10.50 Tf 54.00 568.13 Td (wrapped distance, reads the selected force from the force matrix, and adds that) Tj ET
+BT /F1 10.50 Tf 54.00 550.95 Td (force to the particle acceleration. After the acceleration is accumulated, the) Tj ET
+BT /F1 10.50 Tf 54.00 533.78 Td (kernel updates velocity and position.) Tj ET
+BT /F2 14.00 Tf 54.00 502.60 Td (Force Matrix) Tj ET
+BT /F1 10.50 Tf 54.00 475.60 Td (The force matrix answers one question: how does a source particle affect a) Tj ET
+BT /F1 10.50 Tf 54.00 458.43 Td (target particle?) Tj ET
+BT /F1 10.50 Tf 62.00 435.25 Td (- Rows are target species, the particles being moved.) Tj ET
+BT /F1 10.50 Tf 62.00 419.08 Td (- Columns are source species, the particles causing the movement.) Tj ET
+BT /F1 10.50 Tf 62.00 402.90 Td (- Positive values pull the target toward the source.) Tj ET
+BT /F1 10.50 Tf 62.00 386.73 Td (- Negative values push the target away from the source.) Tj ET
+BT /F1 10.50 Tf 62.00 370.55 Td (- Zero values make that pair mostly ignore each other outside the short-range) Tj ET
+BT /F1 10.50 Tf 54.00 354.38 Td (collision repulsion.) Tj ET
+BT /F1 10.50 Tf 54.00 331.20 Td (The matrix is directional. Species 1 can attract species 2 while species 2) Tj ET
+BT /F1 10.50 Tf 54.00 314.03 Td (repels species 1.) Tj ET
+BT /F2 14.00 Tf 54.00 282.85 Td (Wrapped World) Tj ET
+BT /F1 10.50 Tf 54.00 255.85 Td (Positions are kept inside a square or cube centered on the origin. When a) Tj ET
+BT /F1 10.50 Tf 54.00 238.68 Td (particle crosses one side it re-enters from the opposite side. Distance checks) Tj ET
+BT /F1 10.50 Tf 54.00 221.50 Td (also wrap, so particles near opposite edges still see each other as close.) Tj ET
+BT /F2 14.00 Tf 54.00 190.33 Td (2D and 3D) Tj ET
+BT /F1 10.50 Tf 54.00 163.33 Td (In 2D mode, the kernel forces Z velocity and Z position to zero. In 3D mode, the) Tj ET
+BT /F1 10.50 Tf 54.00 146.15 Td (same rules apply on X, Y, and Z. The viewer changes from an orthographic 2D) Tj ET
+BT /F1 10.50 Tf 54.00 128.98 Td (camera to an orbiting 3D camera.) Tj ET
+BT /F2 14.00 Tf 54.00 97.80 Td (Emergent Patterns) Tj ET
+BT /F1 10.50 Tf 54.00 70.80 Td (Small changes in the force matrix can create clusters, rings, waves, chasing) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 309 >>
+stream
+BT /F1 10.50 Tf 54.00 738.00 Td (streams, turbulent mixing, and layered structures. The application exposes) Tj ET
+BT /F1 10.50 Tf 54.00 720.83 Td (runtime controls because the interesting behavior usually comes from tuning the) Tj ET
+BT /F1 10.50 Tf 54.00 703.65 Td (matrix while watching the result.) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000197 00000 n 
+0000000272 00000 n 
+0000000340 00000 n 
+0000003287 00000 n 
+0000003433 00000 n 
+0000003792 00000 n 
+trailer << /Size 10 /Root 1 0 R >>
+startxref
+3938
+%%EOF
