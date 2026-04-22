@@ -116,15 +116,17 @@ range and taper to zero at the edge.
 The world wraps around like a torus. In 2D the kernel ignores the Z axis. In 3D
 it applies the same wrapped-distance calculation on X, Y, and Z.
 
-## PDFs
+## Presentation PDFs
 
-The repository includes generated explanation PDFs:
+The repository includes dark themed presentation PDFs for audiences that are
+new to particle life. They focus on the concept, emergence, and the high-level
+GPU simulation story rather than application controls:
 
-- `docs/particle-life-overview.pdf`
-- `docs/cuda-kernel-guide.pdf`
-- `docs/controls-and-tuning.pdf`
+- `docs/particle-life-intro-deck.pdf`
+- `docs/emergence-visual-story.pdf`
+- `docs/cuda-simulation-story.pdf`
 
-Regenerate them from the Markdown sources with:
+Regenerate them with:
 
 ```bash
 python3 tools/make_pdfs.py
@@ -139,4 +141,3 @@ python3 tools/make_pdfs.py
   headless test with `--headless-steps`.
 - If the frame rate drops, reduce `--particles`, because this simulation uses a
   simple all-pairs CUDA kernel: the work grows with `N * N`.
-
