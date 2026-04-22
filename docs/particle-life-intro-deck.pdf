@@ -1703,11 +1703,11 @@ BT /F2 48.00 Tf 72.00 469.00 Td (is a table of) Tj ET
 0.9350 0.9550 0.9800 rg
 BT /F2 48.00 Tf 72.00 412.00 Td (relationships) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 414.00 Td (For every pair of species, one number says) Tj ET
+BT /F1 22.00 Tf 76.00 361.00 Td (For every pair of species, one number says) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 383.00 Td (attract, repel, or ignore. That table is enough) Tj ET
+BT /F1 22.00 Tf 76.00 330.00 Td (attract, repel, or ignore. That table is enough) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 352.00 Td (to create surprisingly rich behavior.) Tj ET
+BT /F1 22.00 Tf 76.00 299.00 Td (to create surprisingly rich behavior.) Tj ET
 1.0000 0.7600 0.2200 rg
 92.80 285.00 m 92.80 287.65 90.65 289.80 88.00 289.80 c 85.35 289.80 83.20 287.65 83.20 285.00 c 83.20 282.35 85.35 280.20 88.00 280.20 c 90.65 280.20 92.80 282.35 92.80 285.00 c h f
 0.9350 0.9550 0.9800 rg
@@ -2048,11 +2048,11 @@ BT /F2 48.00 Tf 72.00 469.00 Td (the same small) Tj ET
 0.9350 0.9550 0.9800 rg
 BT /F2 48.00 Tf 72.00 412.00 Td (question) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 414.00 Td (For each nearby particle: how far away is it,) Tj ET
+BT /F1 22.00 Tf 76.00 361.00 Td (For each nearby particle: how far away is it,) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 383.00 Td (what species is it, and should I move toward it) Tj ET
+BT /F1 22.00 Tf 76.00 330.00 Td (what species is it, and should I move toward it) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 352.00 Td (or away from it?) Tj ET
+BT /F1 22.00 Tf 76.00 299.00 Td (or away from it?) Tj ET
 0.0650 0.0850 0.1200 rg
 724.00 182.00 m 1146.00 182.00 l 1159.25 182.00 1170.00 192.75 1170.00 206.00 c 1170.00 458.00 l 1170.00 471.25 1159.25 482.00 1146.00 482.00 c 724.00 482.00 l 710.75 482.00 700.00 471.25 700.00 458.00 c 700.00 206.00 l 700.00 192.75 710.75 182.00 724.00 182.00 c h f
 0.9350 0.9550 0.9800 rg
@@ -2623,11 +2623,11 @@ BT /F2 48.00 Tf 72.00 469.00 Td (microscope for) Tj ET
 0.9350 0.9550 0.9800 rg
 BT /F2 48.00 Tf 72.00 412.00 Td (emergence) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 414.00 Td (The interesting part is not any single particle.) Tj ET
+BT /F1 22.00 Tf 76.00 361.00 Td (The interesting part is not any single particle.) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 383.00 Td (It is the shared behavior that appears when) Tj ET
+BT /F1 22.00 Tf 76.00 330.00 Td (It is the shared behavior that appears when) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 352.00 Td (thousands of simple decisions happen at once.) Tj ET
+BT /F1 22.00 Tf 76.00 299.00 Td (thousands of simple decisions happen at once.) Tj ET
 0.0650 0.0850 0.1200 rg
 122.00 152.00 m 336.00 152.00 l 348.15 152.00 358.00 161.85 358.00 174.00 c 358.00 430.00 l 358.00 442.15 348.15 452.00 336.00 452.00 c 122.00 452.00 l 109.85 452.00 100.00 442.15 100.00 430.00 c 100.00 174.00 l 100.00 161.85 109.85 152.00 122.00 152.00 c h f
 0.0316 0.2057 0.2050 rg

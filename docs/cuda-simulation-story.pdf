@@ -262,11 +262,11 @@ BT /F2 48.00 Tf 72.00 469.00 Td (same question) Tj ET
 0.9350 0.9550 0.9800 rg
 BT /F2 48.00 Tf 72.00 412.00 Td (thousands of times) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 414.00 Td (That repetition is exactly what GPUs are built) Tj ET
+BT /F1 22.00 Tf 76.00 361.00 Td (That repetition is exactly what GPUs are built) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 383.00 Td (for: many small workers doing similar math at) Tj ET
+BT /F1 22.00 Tf 76.00 330.00 Td (for: many small workers doing similar math at) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 352.00 Td (the same time.) Tj ET
+BT /F1 22.00 Tf 76.00 299.00 Td (the same time.) Tj ET
 0.0650 0.0850 0.1200 rg
 698.00 152.00 m 1146.00 152.00 l 1160.36 152.00 1172.00 163.64 1172.00 178.00 c 1172.00 486.00 l 1172.00 500.36 1160.36 512.00 1146.00 512.00 c 698.00 512.00 l 683.64 512.00 672.00 500.36 672.00 486.00 c 672.00 178.00 l 672.00 163.64 683.64 152.00 698.00 152.00 c h f
 0.9350 0.9550 0.9800 rg
@@ -2276,11 +2276,11 @@ BT /F2 48.00 Tf 72.00 469.00 Td (math into live) Tj ET
 0.9350 0.9550 0.9800 rg
 BT /F2 48.00 Tf 72.00 412.00 Td (emergence) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 414.00 Td (Fast parallel updates make the system feel alive) Tj ET
+BT /F1 22.00 Tf 76.00 361.00 Td (Fast parallel updates make the system feel alive) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 383.00 Td (because the audience can watch the rules become) Tj ET
+BT /F1 22.00 Tf 76.00 330.00 Td (because the audience can watch the rules become) Tj ET
 0.6200 0.6800 0.7600 rg
-BT /F1 22.00 Tf 76.00 352.00 Td (motion in real time.) Tj ET
+BT /F1 22.00 Tf 76.00 299.00 Td (motion in real time.) Tj ET
 0.0650 0.0850 0.1200 rg
 122.00 152.00 m 336.00 152.00 l 348.15 152.00 358.00 161.85 358.00 174.00 c 358.00 430.00 l 358.00 442.15 348.15 452.00 336.00 452.00 c 122.00 452.00 l 109.85 452.00 100.00 442.15 100.00 430.00 c 100.00 174.00 l 100.00 161.85 109.85 152.00 122.00 152.00 c h f
 0.0316 0.2057 0.2050 rg

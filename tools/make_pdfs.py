@@ -208,9 +208,10 @@ def header(c: Canvas, deck_title: str, slide_no: int, total: int) -> None:
 def title_block(c: Canvas, kicker: str, title: str, subtitle: str = "") -> None:
     if kicker:
         c.text(72, 584, kicker.upper(), 16, "F2", GOLD)
-    c.paragraph(72, 526, title, 48, 22, 57, "F2", TEXT)
+    title_bottom = c.paragraph(72, 526, title, 48, 22, 57, "F2", TEXT)
     if subtitle:
-        c.paragraph(76, 414, subtitle, 22, 48, 31, "F1", MUTED)
+        subtitle_y = min(414, title_bottom + 6)
+        c.paragraph(76, subtitle_y, subtitle, 22, 48, 31, "F1", MUTED)
 
 
 def bullets(c: Canvas, x: float, y: float, items: Iterable[str],
